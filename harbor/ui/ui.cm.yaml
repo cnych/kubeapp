@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: harbor-ui-config
+  namespace: kube-ops
+data:
+  MYSQL_HOST: mysql
+  MYSQL_PORT: "3306"
+  MYSQL_USR: root
+  MYSQL_PWD: "root123"
+  REGISTRY_URL: http://registry:5000
+  CONFIG_PATH: /etc/ui/app.conf
+  HARBOR_REG_URL: "reg.mydomain.com"
+  HARBOR_ADMIN_PASSWORD: "Harbor12345"
+  HARBOR_URL: http://ui
+  AUTH_MODE: "db_auth"
+  LDAP_URL: "ldaps://ldap.mydomain.com"
+  LDAP_SEARCH_DN: ""
+  LDAP_SEARCH_PWD: ""
+  LDAP_BASE_DN: "ou=people,dc=mydomain,dc=com"
+  LDAP_FILTER: ""
+  LDAP_UID: "uid"
+  LDAP_SCOPE: "3"
+  LOG_LEVEL: debug
+  UI_SECRET: "42VPEolTxWOEouiW"
+  SECRET_KEY: "VTXdK8CdXADDwS9G"
+  GODEBUG: netdns=cgo
+  EXT_ENDPOINT: "http://reg.mydomain.com"
+  TOKEN_URL: http://ui
+  SELF_REGISTRATION: "on"
+  USE_COMPRESSED_JS: ""
+  VERIFY_REMOTE_CERT: "on"
+  TOKEN_EXPIRATION: "30"
+  EXT_REG_URL: "reg.mydomain.com"
+  config: |
+    appname = registry
+    runmode = dev
+    [lang]
+    types = en-US|zh-CN
+    names = en-US|zh-CN
+    [dev]
+    httpport = 80
+    [mail]
+    host = smtp.mydomain.com
+    port = 25
+    username = sample_admin@mydomain.com
+    password = abc
+    from = admin <sample_admin@mydomain.com>
+    ssl = false
+  pkey: |
+    -----BEGIN RSA PRIVATE KEY-----
+    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
+    -----END RSA PRIVATE KEY-----
+
+
+

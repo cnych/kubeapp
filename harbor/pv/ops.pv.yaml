@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: opspv
+  labels:
+    k8s-app: opspv
+spec:
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 100Gi
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /
+    server: 192.168.1.139  # 替换成你自己的nfs 服务器地址
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: opspvc
+  namespace: kube-ops
+  labels:
+    k8s-app: opspvc
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Gi
+  selector:
+    matchLabels:
+      k8s-app: opspv

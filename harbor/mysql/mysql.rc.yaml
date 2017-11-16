@@ -1,0 +1,35 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: mysql-rc
+  namespace: kube-ops
+  labels:
+    name: mysql-rc
+spec:
+  replicas: 1
+  serviceName: "mysql"
+  template:
+    metadata:
+      labels:
+        name: mysql-apps
+    spec:
+      containers:
+      - name: mysql-app
+        image: vmware/harbor-db:v1.2.2
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3306
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom: 
+              configMapKeyRef: 
+               name: harbor-mysql-config
+               key: MYSQL_ROOT_PASSWORD
+        volumeMounts:
+        - name: mysql-storage
+          mountPath: /var/lib/mysql
+          subPath: harbor/mysql
+      volumes:
+      - name: mysql-storage
+        persistentVolumeClaim:
+          claimName: opspvc 
