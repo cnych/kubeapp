@@ -1,0 +1,39 @@
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: node-exporter
+  namespace: kube-ops
+  labels:
+    k8s-app: node-exporter
+spec:
+  template:
+    metadata:
+      labels:
+        k8s-app: node-exporter
+    spec:
+      containers:
+      - image: prom/node-exporter
+        name: node-exporter
+        ports:
+        - containerPort: 9100
+          protocol: TCP
+          name: http
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-app: node-exporter
+  name: node-exporter
+  namespace: kube-ops
+spec:
+  ports:
+  - name: http
+    port: 9100
+    nodePort: 31672
+    protocol: TCP
+  type: NodePort
+  selector:
+    k8s-app: node-exporter

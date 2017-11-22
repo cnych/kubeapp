@@ -1,0 +1,48 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: prometheus
+  name: prometheus
+  namespace: kube-ops
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        k8s-app: prometheus
+    spec:
+      serviceAccountName: prometheus
+      containers:
+      - image: prom/prometheus:v2.0.0
+        name: prometheus
+        command:
+        - "/bin/prometheus"
+        args:
+        - "--config.file=/etc/prometheus/prometheus.yml"
+        - "--storage.tsdb.path=/prometheus"
+        - "--storage.tsdb.retention=15d"
+        ports:
+        - containerPort: 9090
+          protocol: TCP
+          name: http
+        volumeMounts:
+        - mountPath: "/prometheus"
+          name: data
+          subPath: prometheus/data
+        - mountPath: "/etc/prometheus"
+          name: config-volume
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 200m
+            memory: 1Gi
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: opspvc
+      - configMap:
+          name: prometheus-config
+        name: config-volume
