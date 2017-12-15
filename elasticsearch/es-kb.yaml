@@ -1,0 +1,49 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: kibana
+  namespace: kube-ops
+  labels:
+    k8s-app: kibana
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: kibana
+  template:
+    metadata:
+      labels:
+        k8s-app: kibana
+    spec:
+      containers:
+      - name: kibana
+        image: cfontes/kibana-xpack-less:5.5.0
+        resources:
+          # need more cpu upon initialization, therefore burstable class
+          limits:
+            cpu: 1000m
+          requests:
+            cpu: 100m
+        env:
+          - name: "CLUSTER_NAME"
+            value: "myesdb"
+          #- name: SERVER_BASEPATH
+          #  value: /api/v1/proxy/namespaces/kube-ops/services/kibana
+          - name: XPACK_SECURITY_ENABLED
+            value: 'false'
+          - name: XPACK_GRAPH_ENABLED
+            value: 'false'
+          - name: XPACK_ML_ENABLED
+            value: 'false'
+          - name: XPACK_REPORTING_ENABLED
+            value: 'false'
+          - name: ELASTICSEARCH_URL
+            value: http://elasticsearch:9200
+          - name: XPACK_MONITORING_ENABLED
+            value: "false"
+        ports:
+        - containerPort: 5601
+          name: ui
+          protocol: TCP
