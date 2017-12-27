@@ -14,14 +14,14 @@ spec:
     spec:
       serviceAccountName: prometheus
       containers:
-      - image: prom/prometheus:v2.0.0
+      - image: prom/prometheus:v2.0.0-rc.3
         name: prometheus
         command:
         - "/bin/prometheus"
         args:
         - "--config.file=/etc/prometheus/prometheus.yml"
         - "--storage.tsdb.path=/prometheus"
-        - "--storage.tsdb.retention=15d"
+        - "--storage.tsdb.retention=24h"
         ports:
         - containerPort: 9090
           protocol: TCP
@@ -29,7 +29,6 @@ spec:
         volumeMounts:
         - mountPath: "/prometheus"
           name: data
-          subPath: prometheus/data
         - mountPath: "/etc/prometheus"
           name: config-volume
         resources:
@@ -39,10 +38,31 @@ spec:
           limits:
             cpu: 200m
             memory: 1Gi
+      - image: quay.io/prometheus/alertmanager:v0.12.0
+        name: alertmanager
+        args:
+        - "-config.file=/etc/alertmanager/config.yml"
+        - "-storage.path=/alertmanager"
+        ports:
+        - containerPort: 9093
+          protocol: TCP
+          name: http
+        volumeMounts:
+        - name: alertmanager-config-volume
+          mountPath: /etc/alertmanager
+        resources:
+          requests:
+            cpu: 50m
+            memory: 50Mi
+          limits:
+            cpu: 200m
+            memory: 200Mi
       volumes:
       - name: data
-        persistentVolumeClaim:
-          claimName: opspvc
+        emptyDir: {}
       - configMap:
           name: prometheus-config
         name: config-volume
+      - name: alertmanager-config-volume
+        configMap:
+          name: alertmanager
