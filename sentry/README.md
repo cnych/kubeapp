@@ -37,3 +37,5 @@ kubectl create -f svc.yaml
 
 至此，`sentry`在`kubernetes`上就部署完成了。
 
+![sentry](https://blog.sentry.io/img/post-images/sentry-v8/stream.png)
+
