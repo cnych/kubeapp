@@ -5,21 +5,24 @@ metadata:
   namespace: kube-ops
 
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: prometheus
-  namespace: kube-ops
 rules:
 - apiGroups: [""]
   resources:
   - nodes
-  - nodes/proxy
   - services
   - endpoints
   - pods
+  - nodes/proxy
   verbs: ["get", "list", "watch"]
-- nonResourceURLs: ["/metrics"]
+- apiGroups: [""]
+  resources:
+  - configmaps
+  verbs: ["get"]
+- nonResourceURLs: ["/metics"]  # 对非资源型 endpoint metrics 进行 get 操作
   verbs: ["get"]
 
 ---
@@ -27,7 +30,6 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
   name: prometheus
-  namespace: kube-ops
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
