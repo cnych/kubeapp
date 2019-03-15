@@ -12,8 +12,6 @@ spec:
       labels:
         name: gitlab
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: node02
       containers:
       - name: gitlab
         image: sameersbn/gitlab:11.8.0
