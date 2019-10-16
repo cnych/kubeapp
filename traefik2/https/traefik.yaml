@@ -1,0 +1,61 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: traefik
+  namespace: kube-system
+  labels:
+    k8s-app: traefik-ingress-lb
+spec:
+  selector:
+    matchLabels:
+      k8s-app: traefik-ingress-lb
+  template:
+    metadata:
+      labels:
+        k8s-app: traefik-ingress-lb
+        name: traefik-ingress-lb
+    spec:
+      serviceAccountName: traefik-ingress-controller
+      tolerations:
+      - operator: "Exists"
+      nodeSelector:
+        kubernetes.io/hostname: ydzs-master
+      containers:
+      - image: traefik:v2.0
+        name: traefik-ingress-lb
+        ports:
+        - name: web
+          containerPort: 80
+          hostPort: 80
+        - name: websecure
+          containerPort: 443
+          hostPort: 443
+        - name: admin
+          containerPort: 8080
+        args:
+        - --entrypoints.web.Address=:80
+        - --entrypoints.websecure.Address=:443
+        - --api.insecure=true
+        - --providers.kubernetescrd
+        - --api
+        - --api.dashboard=true
+        - --accesslog
+        - --certificatesresolvers.default.acme.tlsChallenge=true
+        - --certificatesResolvers.default.acme.email="email@gmail.com"
+        - --certificatesResolvers.default.acme.storage="acme.json"
+        #- --certificatesresolvers.default.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  selector:
+    k8s-app: traefik-ingress-lb
+  ports:
+    - protocol: TCP
+      port: 8080
+      name: admin
