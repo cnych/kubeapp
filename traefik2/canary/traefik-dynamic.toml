@@ -1,0 +1,27 @@
+[http]
+  [http.routers]
+    [http.routers.Router0]
+      entryPoints = ["web"]
+      service = "app"
+      rule = "Host(`nginx.qikqiak.com`)"
+
+  [http.services]
+    [http.services.app]
+
+      [[http.services.app.weighted.services]]
+        name = "appv1"
+        weight = 3
+
+      [[http.services.app.weighted.services]]
+        name = "appv2"
+        weight = 1
+
+    [http.services.appv1]
+      [http.services.appv1.loadBalancer]
+        [[http.services.appv1.loadBalancer.servers]]
+          url = "http://appv1/"
+
+    [http.services.appv2]
+      [http.services.appv2.loadBalancer]
+        [[http.services.appv2.loadBalancer.servers]]
+          url = "http://appv2/"

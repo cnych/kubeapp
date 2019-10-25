@@ -1,0 +1,49 @@
+# 通过 kubectl create configmap traefik-dynamic-conf --from-file=traefik-dynamic.toml -n kube-system 创建 ConfigMap
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: traefik
+  namespace: kube-system
+  labels:
+    k8s-app: traefik-ingress-lb
+spec:
+  selector:
+    matchLabels:
+      k8s-app: traefik-ingress-lb
+  template:
+    metadata:
+      labels:
+        k8s-app: traefik-ingress-lb
+        name: traefik-ingress-lb
+    spec:
+      serviceAccountName: traefik-ingress-controller
+      tolerations:
+      - operator: "Exists"
+      nodeSelector:
+        kubernetes.io/hostname: ydzs-master
+      volumes:
+      - name: config
+        configMap:
+          name: traefik-dynamic-conf
+      containers:
+      - image: traefik:v2.0.2
+        name: traefik-ingress-lb
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        ports:
+        - name: web
+          containerPort: 80
+          hostPort: 80
+        - name: admin
+          containerPort: 8080
+          hostPort: 8080
+        args:
+        - --entrypoints.web.Address=:80
+        - --api.insecure=true
+        - --providers.file.watch=true
+        - --providers.file.filename=/config/traefik-dynamic.toml
+        - --api
+        - --api.debug=true
+        - --api.dashboard=true
+        - --accesslog
